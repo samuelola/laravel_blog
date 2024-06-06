@@ -21,7 +21,7 @@ class BlogPostsPolicy
      */
     public function view(User $user, BlogPost $blogPost): bool
     {
-        //
+        return $user->id == $blogPost->user_id;
     }
 
     /**
