@@ -6,6 +6,10 @@
     <title>Document</title>
 </head>
 <body>
+    <form method="post" action="{{route('logout')}}">
+        @csrf
+        <input type="submit" value="Logout" name="logout"/>
+    </form>
     @yield('content')
 </body>
 </html>

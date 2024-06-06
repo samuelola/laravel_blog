@@ -11,6 +11,7 @@ class User extends Authenticatable
 {
     use HasFactory, Notifiable;
 
+   
     /**
      * The attributes that are mass assignable.
      *
@@ -44,4 +45,9 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    public function blogpost(){
+        return $this->hasMany(BlogPost::class);
+    }
+
 }

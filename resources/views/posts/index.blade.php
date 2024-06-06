@@ -1,19 +1,31 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<body>
+
+@extends('layouts.app')
+
+@section('content')
+@if(session('status'))
+      <p style="color:green">{{session('status')}}</div>
+   @endif
+    @if($posts->count() > 0)
     @foreach ($posts as $post)
+    <p class="text-muted">
+      Added {{$post->created_at->diffForHumans()}}
+      By {{$post->user->name}}
+    </p>
         <div>Title:{{$post->title}}</div>
+        @can('delete', $post)
         <div>Content:{{$post->content}}</div>
         <form action="{{route('posts.destroy',['post'=>$post->id])}}" method="POST">
           @csrf
           @method('DELETE')
           <input type="submit" value="Delete"/>
         </form>
+        @endcan
+      @can('update', $post)  
+      <a class="btn" href="{{route('posts.edit',$post)}}">Edit Post</a> | <a class="btn" href="{{route('posts.show',$post)}}">View Post</a>
+      @endcan
     @endforeach
-</body>
-</html>
+
+    @else
+      <p>There is no blog post</p>
+    @endif
+@endsection

@@ -11,15 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('comments', function (Blueprint $table) {
-            if(env('DB_CONNECTION') !== 'sqlite_testing'){
-                $table->dropForeign(['blog_post_id']);
-            }
+        Schema::create('blog_posts', function (Blueprint $table) {
             $table->id();
             $table->timestamps();
+            $table->string('title');
             $table->text('content');
-            $table->unsignedBigInteger('blog_post_id')->index();
-            $table->foreign('blog_post_id')->references('id')->on('blog_posts')->onDelete('cascade');
         });
     }
 
@@ -28,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('comments');
+        Schema::dropIfExists('blog_posts');
     }
 };

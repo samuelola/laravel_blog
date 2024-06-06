@@ -3,7 +3,7 @@
 @section('title')
 
 @section('content')
-
+   
    <form action="{{route('posts.store')}}" method="post">
     @csrf
      @include('posts.partials.form')

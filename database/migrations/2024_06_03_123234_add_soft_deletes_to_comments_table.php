@@ -11,11 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('profiles', function (Blueprint $table) {
-            $table->id();
-            $table->timestamps();
-            $table->unsignedBigInteger('author_id')->unique();
-            $table->foreign('author_id')->references('id')->on('authors')->onDelete('cascade');
+        Schema::table('comments', function (Blueprint $table) {
+           $table->softDeletes();
         });
     }
 
@@ -24,6 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('profiles');
+        Schema::table('comments', function (Blueprint $table) {
+            $table->dropSoftDeletes();
+        });
     }
 };
