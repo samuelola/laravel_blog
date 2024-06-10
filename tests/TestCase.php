@@ -8,7 +8,6 @@ use App\Models\User;
 abstract class TestCase extends BaseTestCase
 {
     protected function user(){
-
-        return factory(User::class)->create();
+        return User::factory()->create();
     }
 }

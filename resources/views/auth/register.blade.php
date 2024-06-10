@@ -13,7 +13,13 @@
     <p>Email:<input id="email" type="email" class="form-control {{ $errors->has('email') ? ' is-invalid' : '' }}" name="email" value="{{ old('email') }}" required></p>
     <p>Password:<input id="password" type="password" class="form-control {{ $errors->has('password') ? ' is-invalid' : '' }}" name="password" value="{{ old('password') }}" required></p>
     <p><input type="submit" value="Submit" name="submit"/></p>
-    <p><a href="{{route('signin')}}">Login</a></p>
+    
     </form>
+   
+    @guest
+    <p><a href="{{route('signin')}}">Login</a></p>
+    @else
+    <p><a href="{{route('posts.index')}}">Posts</a></p>
+    @endguest
 </body>
 </html>

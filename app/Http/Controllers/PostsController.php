@@ -4,12 +4,23 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\BlogPost;
+use App\Models\User;
 use App\Http\Requests\StorePost;
 use DB;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
+use Illuminate\Support\Facades\Cache;
 
-class PostsController extends Controller
+class PostsController extends Controller implements HasMiddleware
 {
+
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('auth', except: ['index']),
+        ];
+    }
     /**
      * Display a listing of the resource.
      */
@@ -27,9 +38,27 @@ class PostsController extends Controller
         // }
 
         // dd(DB::getQueryLog());
+        
+        $mostCommented = Cache::remember('mostCommented', now()->addSeconds(10),function(){
+            return BlogPost::MostCommented()->take(5)->get();
+        });
 
-        $posts = BlogPost::all();
-        return view('posts.index',['posts'=>$posts]);
+        $MostActive = Cache::remember('MostActive', now()->addSeconds(10),function(){
+            return User::MostBlogPosts()->take(5)->get();
+        });
+
+        $mostActiveLastMonth = Cache::remember('mostActiveLastMonth', now()->addSeconds(10),function(){
+            return User::WithMostBlogPostsLastMonth()->take(5)->get();
+        });
+
+
+        $posts = BlogPost::latest()->with('user')->get();
+        return view('posts.index',[
+            'posts'=>$posts,
+            'mostcommented' => $mostCommented,
+            'MostActive'=>$MostActive,
+            'mostActiveLastMonth' => $mostActiveLastMonth
+        ]);
     }
 
     /**
@@ -46,7 +75,9 @@ class PostsController extends Controller
      */
     public function store(StorePost $request)
     { 
-        $post = BlogPost::create($request->validated());
+        $validatedData = $request->validated();
+        $validatedData['user_id'] = $request->user()->id;
+        BlogPost::create($validatedData);
         $request->session()->flash('status', 'The Blog Post was created!');
         return redirect()->route('posts.index');
     }
@@ -56,9 +87,55 @@ class PostsController extends Controller
      */
     public function show(string $id)
     {
-        $post = BlogPost::findOrFail($id);
-        Gate::authorize('view',$post); 
-        return view('posts.show',['post'=>$post]);
+        // $post = BlogPost::with(['comments'=>function ($query){
+        //     return $query->latest();
+        // }])->findOrFail($id);
+
+        //this is how to add cache check the blogpost db to remove cache
+        $blogPost = Cache::remember("blog-post-{$id}", 60, function() use ($id){
+
+            return BlogPost::with('comments')->findOrFail($id);
+        });
+
+        //get current user session id
+
+        $sessionId = session()->getId();
+        $counterKey = "blog-post-{$id}-counter";
+        $usersKey = "blog-post-{$id}-users";
+        $users = Cache::get($usersKey,[]);
+        $usersUpdate = [];
+        $difference = 0;
+        $now = now();
+
+        foreach($users as $session => $lastVisit){
+            
+            if($now->diffInMinutes($lastVisit) >= 1){
+                $difference--; 
+            }else{
+                $usersUpdate[$session] = $lastVisit;
+            }
+        }
+
+        if(!array_key_exists($sessionId, $users) || $now->diffInMinutes($users[$sessionId])){
+            $difference++;
+        }
+
+        $usersUpdate[$sessionId] = $now;
+
+        Cache::forever($usersKey,$usersUpdate);
+
+        if(!Cache::has($counterKey)){
+            Cache::forever($counterKey,1);
+        }else{
+            Cache::increment($counterKey,$difference);
+        }
+        
+        $counter = Cache::get($counterKey);
+
+        return view('posts.show',[
+            'post'=>$blogPost,
+            'counter' => $counter
+        ]);
     }
 
     /**

@@ -12,9 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('comments', function (Blueprint $table) {
-            if(env('DB_CONNECTION') !== 'sqlite_testing'){
-                $table->dropForeign(['blog_post_id']);
-            }
+            // if(env('DB_CONNECTION') !== 'sqlite_testing'){
+            //     $table->dropForeign(['blog_post_id']);
+            // }
             $table->id();
             $table->timestamps();
             $table->text('content');

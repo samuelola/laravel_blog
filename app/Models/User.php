@@ -6,6 +6,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Database\Eloquent\Builder;
 
 class User extends Authenticatable
 {
@@ -48,6 +49,21 @@ class User extends Authenticatable
 
     public function blogpost(){
         return $this->hasMany(BlogPost::class);
+    }
+
+
+    public function scopeMostBlogPosts(Builder $query)
+    {
+       return $query->withCount('blogpost')->orderBy('id','desc');
+    }
+
+    public function scopeWithMostBlogPostsLastMonth(Builder $query)
+    {
+       return $query->withCount(['blogpost'=>function(Builder $query){
+           $query->whereBetween(static::CREATED_AT,[now()->subMonths(1), now()]);
+       }])
+       ->has('blogpost','>=',2)
+       ->orderBy('id','desc');
     }
 
 }

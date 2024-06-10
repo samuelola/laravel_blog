@@ -44,18 +44,18 @@ class AuthServiceProvider extends ServiceProvider
 
     //Gate::resource('posts',BlogPostsPolicy::class);
 
-    //    Gate::before(function ($user, $ability){
+       Gate::before(function ($user, $ability){
 
-    //          //this allows admin to do everything as autheticated user.
-    //     //    if($user->is_admin){
-    //     //         return true;
-    //     //    }
+             //this allows admin to do everything as autheticated user.
+        //    if($user->is_admin){
+        //         return true;
+        //    }
 
-    //         // this only allow admin to update post and not to delete them
-    //        if($user->is_admin && in_array($ability,['update-post'])){
-    //         return true;
-    //        }
-    //    });
+            // this only allow admin to update post and not to delete them
+           if($user->is_admin && in_array($ability,['update','delete','view'])){
+            return true;
+           }
+       });
 
     //    Gate::after(function ($user, $ability,$result){
     //         if($user->is_admin){

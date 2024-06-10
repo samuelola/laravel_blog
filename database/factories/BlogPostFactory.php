@@ -18,7 +18,8 @@ class BlogPostFactory extends Factory
     {
         return [
             'title' => fake()->sentence(10),
-            'content' => fake()->paragraph(5,true)
+            'content' => fake()->paragraph(5,true),
+            'created_at' => fake()->dateTimeBetween('-3 months')
         ];
     }
 
@@ -30,11 +31,21 @@ class BlogPostFactory extends Factory
         ]);
     }
 
-    public function newTitle()
-    {
-        return $this->state(fn (array $attributes)=>[
+    // public function newTitle()
+    // {
+    //     return $this->state(fn (array $attributes)=>[
 
-            'title' => 'New title'
-        ]);
+    //         'title' => 'New title'
+    //     ]);
+    // }
+
+        public function newTitle(): Factory
+    {
+        return $this->state(function (array $attributes) {
+            return [
+                'title' => 'New title',
+                'content' => 'New content for blog post'
+            ];
+        });
     }
 }

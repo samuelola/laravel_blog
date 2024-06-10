@@ -20,12 +20,38 @@
           <input type="submit" value="Delete"/>
         </form>
         @endcan
-      @can('update', $post)  
-      <a class="btn" href="{{route('posts.edit',$post)}}">Edit Post</a> | <a class="btn" href="{{route('posts.show',$post)}}">View Post</a>
-      @endcan
+      @auth
+        @can('update', $post)  
+        <a class="btn" href="{{route('posts.edit',$post)}}">Edit Post</a> | <a class="btn" href="{{route('posts.show',$post)}}">View Post</a>
+        @endcan
+      @endauth  
+      
     @endforeach
 
     @else
       <p>There is no blog post</p>
     @endif
+    
+    <div>
+    <p>Most Commented Post</p>
+         @foreach($mostcommented as $post)
+            
+            <a href="{{route('posts.show',['post'=>$post->id])}}">{{$post->title}}</a>
+         @endforeach
+    </div>
+    
+    <div>
+    <p>Most Active User</p>
+         @foreach($MostActive as $user)
+            {{$user->name}}
+           
+         @endforeach
+    </div>
+    <div>
+    <p>Most Active User Lastmont</p>
+         @foreach($mostActiveLastMonth as $user)
+            {{$user->name}}
+           
+         @endforeach
+    </div>
 @endsection

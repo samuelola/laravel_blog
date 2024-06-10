@@ -9,7 +9,7 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::resource('posts',PostsController::class)->middleware('auth');
+Route::resource('posts',PostsController::class);
 Route::get('register',[RegisterController::class,'register'])->name('signup');
 Route::get('/',[LoginController::class,'signin'])->name('signin');
 

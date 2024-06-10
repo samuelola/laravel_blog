@@ -4,13 +4,21 @@
 @if(session('status'))
       <p style="color:green">{{session('status')}}</div>
 @endif   
-<h1>Title:{{$post->title}}</h1>
+<h1>
+    
+   Title:{{$post->title}}
+   @if ((new Carbon\Carbon())->diffInMinutes($post->created_at) < 25)
+
+    <x-badge type="primary" show="false">
+        New !
+    </x-badge>
+  @endif
+
+</h1>
 <p>Content:{{$post->content}}</p>
 <p>Added {{$post->created_at->diffForHumans()}}</p>
-@if ((new Carbon\Carbon())->diffInMinutes($post->created_at) > 5)
-    <strong>New !</strong>
-@endif
 
+<p>Currently read by {{$counter}} people</p>
 <h4>Comments</h4>
 
 @foreach ($post->comments as $comment)
