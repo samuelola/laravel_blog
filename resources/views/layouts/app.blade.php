@@ -12,9 +12,11 @@
         @csrf
         <input type="submit" value="Logout" name="logout"/>
     </form>
-    <a href="{{route('posts.create')}}">create Post</a>
+    <a style="color:#000 !important;" href="{{route('posts.create')}}">create Post</a>
     ({{Auth::user()->name ?? ''}})
     @yield('content')
+    
+    
   
 <script src="{{asset('bootstrap.min.js')}}"></script>
 </body>

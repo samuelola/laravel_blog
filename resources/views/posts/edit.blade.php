@@ -8,7 +8,10 @@
     @csrf
     @method('PUT')
      @include('posts.partials.form')
-     <div><input type="submit" name="Update" value="Update"/></div>
+     <div class="form-group">
+      <input type="submit" name="Update" value="Update"/>
+    </div>
    </form>
+  
 
 @endsection

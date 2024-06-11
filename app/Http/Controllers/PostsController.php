@@ -5,12 +5,14 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\BlogPost;
 use App\Models\User;
+use App\Models\Image;
 use App\Http\Requests\StorePost;
 use DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Storage;
 
 class PostsController extends Controller implements HasMiddleware
 {
@@ -77,7 +79,15 @@ class PostsController extends Controller implements HasMiddleware
     { 
         $validatedData = $request->validated();
         $validatedData['user_id'] = $request->user()->id;
-        BlogPost::create($validatedData);
+        $blogPost= BlogPost::create($validatedData);
+        if($request->hasFile('thumbnail')){
+            $path = $request->file('thumbnail')->store('thumbnails');
+            $blogPost->image()->save(
+                // to associate the image with the blog post
+                Image::create(['path'=>$path])
+            );
+        }
+       
         $request->session()->flash('status', 'The Blog Post was created!');
         return redirect()->route('posts.index');
     }
@@ -160,6 +170,23 @@ class PostsController extends Controller implements HasMiddleware
         // }
         Gate::authorize('update',$post);
         $post->update($request->validated());
+        if($request->hasFile('thumbnail')){
+            $path = $request->file('thumbnail')->store('thumbnails');
+            if($post->image){
+                //get and delete the old file
+                Storage::delete($post->image->path);
+               //if the file has an image , modify to the new one
+               $post->image->path = $path;
+               $post->image->save();
+            }else{
+                //store a new image
+                $post->image()->save(
+                    // to associate the image with the blog post
+                    Image::create(['path'=>$path])
+                );
+            }
+            
+        }
         $request->session()->flash('status', 'Blog Post Updated!');
         //return redirect()->route('posts.show',['post'=>$post]);
         return view('posts.show',['post'=>$post]);
