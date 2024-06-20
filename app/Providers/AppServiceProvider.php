@@ -4,6 +4,11 @@ namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\Facades\Schema;
+use App\Models\BlogPost;
+use App\Observers\BlogPostObserver;
+use App\Services\Counter;
+
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -20,6 +25,25 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        Schema::defaultStringLength(191);
         Blade::componentNamespace('components.badge','badge');
+
+        BlogPost::observe(BlogPostObserver::class);
+        // $this->app->bind(Counter::class, function($app){
+        //      return new Counter(5);
+        // });
+
+        $this->app->singleton(Counter::class, function($app){
+             return new Counter(
+                $app->make('Illuminate\Contracts\Cache\Factory'),
+                $app->make('Illuminate\Contracts\Session\Session'),
+                env('COUNTER_TIMEOUT'));
+        });
+
+        $this->app->bind(
+
+            'App\Contracts\CounterContract',
+            Counter::class
+        );
     }
 }

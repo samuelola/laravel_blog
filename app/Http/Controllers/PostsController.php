@@ -13,6 +13,8 @@ use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
+use App\Services\Counter;
+use App\Facades\CounterFacade;
 
 class PostsController extends Controller implements HasMiddleware
 {
@@ -81,10 +83,10 @@ class PostsController extends Controller implements HasMiddleware
         $validatedData['user_id'] = $request->user()->id;
         $blogPost= BlogPost::create($validatedData);
         if($request->hasFile('thumbnail')){
-            $path = $request->file('thumbnail')->store('thumbnails');
+            $path = $request->file('thumbnail')->store('thumbnails'); //this allows you to save in a folder
             $blogPost->image()->save(
                 // to associate the image with the blog post
-                Image::create(['path'=>$path])
+                Image::make(['path'=>$path])
             );
         }
        
@@ -101,50 +103,21 @@ class PostsController extends Controller implements HasMiddleware
         //     return $query->latest();
         // }])->findOrFail($id);
 
+        $post = BlogPost::findOrFail($id);
+
         //this is how to add cache check the blogpost db to remove cache
-        $blogPost = Cache::remember("blog-post-{$id}", 60, function() use ($id){
+        // $blogPost = Cache::remember("blog-post-{$id}", 60, function() use ($id){
 
-            return BlogPost::with('comments')->findOrFail($id);
-        });
+        //     return BlogPost::with('comments')->findOrFail($id);
+        // });
 
-        //get current user session id
+        // //get current user session id
 
-        $sessionId = session()->getId();
-        $counterKey = "blog-post-{$id}-counter";
-        $usersKey = "blog-post-{$id}-users";
-        $users = Cache::get($usersKey,[]);
-        $usersUpdate = [];
-        $difference = 0;
-        $now = now();
-
-        foreach($users as $session => $lastVisit){
-            
-            if($now->diffInMinutes($lastVisit) >= 1){
-                $difference--; 
-            }else{
-                $usersUpdate[$session] = $lastVisit;
-            }
-        }
-
-        if(!array_key_exists($sessionId, $users) || $now->diffInMinutes($users[$sessionId])){
-            $difference++;
-        }
-
-        $usersUpdate[$sessionId] = $now;
-
-        Cache::forever($usersKey,$usersUpdate);
-
-        if(!Cache::has($counterKey)){
-            Cache::forever($counterKey,1);
-        }else{
-            Cache::increment($counterKey,$difference);
-        }
-        
-        $counter = Cache::get($counterKey);
+        // $counter = resolve(Counter::class);
 
         return view('posts.show',[
-            'post'=>$blogPost,
-            'counter' => $counter
+            'post'=>$post,
+            // 'counter' => CounterFacade::increment->increment("blog-post-{$id}",['blog-post'])
         ]);
     }
 
@@ -170,6 +143,7 @@ class PostsController extends Controller implements HasMiddleware
         // }
         Gate::authorize('update',$post);
         $post->update($request->validated());
+
         if($request->hasFile('thumbnail')){
             $path = $request->file('thumbnail')->store('thumbnails');
             if($post->image){
@@ -182,7 +156,7 @@ class PostsController extends Controller implements HasMiddleware
                 //store a new image
                 $post->image()->save(
                     // to associate the image with the blog post
-                    Image::create(['path'=>$path])
+                    Image::make(['path'=>$path])
                 );
             }
             

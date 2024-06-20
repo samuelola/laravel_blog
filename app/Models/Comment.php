@@ -13,9 +13,15 @@ class Comment extends Model
 
     use SoftDeletes;
 
-    public function blogPost(){
+    protected $fillable = ['content','user_id'];
 
-        return $this->belongsTo(BlogPost::class);
+    public function commentable(){
+
+        return $this->morphTo();
+    }
+
+    public function user(){
+        return $this->belongsTo(User::class);
     }
 
     public function scopeLatest(Builder $query){
@@ -23,9 +29,5 @@ class Comment extends Model
         return $query->orderBy(static::CREATED_AT,'desc');
     }
 
-    public static function boot(){
-
-        parent::boot();
-        //static::addGlobalScope(new LatestScope);
-    }
+    
 }

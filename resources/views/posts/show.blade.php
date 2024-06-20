@@ -20,11 +20,12 @@
 
             </h3>
 
-            @if ($post->image)
-
-            <img style="width:300px;height:300px;" src="{{$post->image->url()}}" alt="Image">
+            
+        
+            @if (empty($post->image->path))
+             {{"No Image"}}
             @else
-
+             <img style="width:300px;height:300px;" src="{{$post->image->url()}}" alt="Image">
             @endif
     </div>
 
@@ -37,14 +38,28 @@
 
     <h4>Comments</h4>
 
+    <!--add comment-->
+
+    <form action="{{route('addcomment',['post'=>$post->id])}}" method="post">
+        @csrf
+       <div class="form-group">
+            <label for="">Comments</label>
+            <textarea class="form-control" name="content"></textarea>
+        </div>
+        <div class="form-group">
+        <input class="btn btn-success" type="submit" name="Add Comment" value="Add Comment"/>
+        </div>
+    </form>
+
     @foreach ($post->comments as $comment)
-        <p>{{$comment->content}}</p>
+        
+        <p>{{$comment->content}} By <a style="color:blue; text-decoration:none;" href="{{route('users.show',['user'=>$comment->user->id])}}">{{$comment->user->name}}</a></p>
         <p class="text-muted">
             added {{$comment->created_at->diffForHumans()}}
         </p>
     @endforeach
 
-    <a class="btn" href="{{route('posts.index')}}">All Posts</a>
+    <a class="btn btn-primary btn-sm" href="{{route('posts.index')}}">View All Posts</a>
     @endsection
     </div>
 

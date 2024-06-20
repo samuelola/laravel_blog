@@ -19,7 +19,7 @@ class BlogPost extends Model
 
     public function comments(){
 
-        return $this->hasMany(Comment::class)->latest();
+        return $this->morphMany(Comment::class,'commentable')->latest();
     }
 
     public function user(){
@@ -27,7 +27,7 @@ class BlogPost extends Model
     }
 
     public function image(){
-        return $this->hasOne(Image::class);
+        return $this->morphOne(Image::class,'imageable');
     }
 
     public function scopeLatest(Builder $query){
@@ -50,20 +50,5 @@ class BlogPost extends Model
 
         parent::boot();
 
-        //this delete the comments of the post
-        static::deleting(function (BlogPost $blogPost){
-            
-            $blogPost->comments()->delete();  
-        });
- 
-        //this is how to remove cache
-        static::updating(function (BlogPost $blogpost){
-            Cache::forget("blog-post-{$blogpost->id}");
-        });
-
-        static::restoring(function (BlogPost $blogPost){
-
-            $blogPost->comments()->restore();
-        });
     }
 }

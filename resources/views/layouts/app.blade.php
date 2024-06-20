@@ -13,7 +13,9 @@
         <input type="submit" value="Logout" name="logout"/>
     </form>
     <a style="color:#000 !important;" href="{{route('posts.create')}}">create Post</a>
-    ({{Auth::user()->name ?? ''}})
+    ({{Auth::user()->name ?? ''}}) |
+
+    
     @yield('content')
     
     
