@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Schema;
 use App\Models\BlogPost;
 use App\Observers\BlogPostObserver;
 use App\Services\Counter;
+use Illuminate\Support\Facades\Event;
 
 
 class AppServiceProvider extends ServiceProvider
@@ -45,5 +46,7 @@ class AppServiceProvider extends ServiceProvider
             'App\Contracts\CounterContract',
             Counter::class
         );
+
+
     }
 }

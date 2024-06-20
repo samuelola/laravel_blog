@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
 use App\Services\Counter;
 use App\Facades\CounterFacade;
+use App\Events\BlogPostPosted;
 
 class PostsController extends Controller implements HasMiddleware
 {
@@ -89,6 +90,8 @@ class PostsController extends Controller implements HasMiddleware
                 Image::make(['path'=>$path])
             );
         }
+
+        event(new BlogPostPosted($blogPost));
        
         $request->session()->flash('status', 'The Blog Post was created!');
         return redirect()->route('posts.index');

@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Mail;
 use App\Mail\OrderComment;
 use App\Jobs\NotifyUsersPostWasCommented;
 use App\Jobs\ThrottledMail;
+use App\Events\CommentPosted;
 
 class PostCommentController extends Controller
 {
@@ -28,9 +29,11 @@ class PostCommentController extends Controller
           // Mail::to($post->user)->queue(
           //     new OrderComment($comment)
           // );
+
+          event(new CommentPosted($comment));
           
-          ThrottledMail::dispatch(new OrderComment($comment), $post->user)->onQueue('high');
-          NotifyUsersPostWasCommented::dispatch($comment)->onQueue('low');
+          // ThrottledMail::dispatch(new OrderComment($comment), $post->user);
+          // NotifyUsersPostWasCommented::dispatch($comment);
 
         //Third method
 

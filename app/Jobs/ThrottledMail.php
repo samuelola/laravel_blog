@@ -35,10 +35,10 @@ class ThrottledMail implements ShouldQueue
      */
     public function handle(): void
     {
+        // allow 2 emails sent every 12 seconds
         Redis::throttle('mailtrap')->allow(2)->every(12)->then(function (){
            Mail::to($this->user)->send($this->mail);
         },
-
         function (){
             return $this->release(5);
         }
