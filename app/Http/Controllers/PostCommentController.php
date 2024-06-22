@@ -11,11 +11,24 @@ use App\Jobs\NotifyUsersPostWasCommented;
 use App\Jobs\ThrottledMail;
 use App\Events\CommentPosted;
 use App\Traits\LoggingTrait;
+use App\Http\Resources\Comment as CommentResource;
 
 class PostCommentController extends Controller
 
 {
     use LoggingTrait;
+    
+    public function index(BlogPost $post){
+        
+      // dump(is_array($post->comments));
+      // dump(get_class($post->comments));
+      // die();
+        // return $post->comments;
+        //return new CommentResource($post->comments->first());
+        return CommentResource::collection($post->comments()->with('user')->get());
+        //return $post->comments()->with('user')->get();
+    }
+
     public function store (BlogPost $post, StoreComment $request){
 
          $comment = $post->comments()->create([

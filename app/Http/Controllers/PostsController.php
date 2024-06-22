@@ -23,7 +23,7 @@ class PostsController extends Controller implements HasMiddleware
     public static function middleware(): array
     {
         return [
-            new Middleware('auth', except: ['index']),
+            new Middleware('auth', except: ['index','show']),
         ];
     }
     /**

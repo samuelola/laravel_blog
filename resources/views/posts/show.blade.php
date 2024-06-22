@@ -53,7 +53,7 @@
 
     @foreach ($post->comments as $comment)
         
-        <p>{{$comment->content}} By <a style="color:blue; text-decoration:none;" href="{{route('users.show',['user'=>$comment->user->id])}}">{{$comment->user->name}}</a></p>
+        <p>{{$comment->content ?? ''}} By <a style="color:blue; text-decoration:none;" href="{{route('users.show',['user'=>$comment->user->id])}}">{{$comment->user->name}}</a></p>
         <p class="text-muted">
             added {{$comment->created_at->diffForHumans()}}
         </p>

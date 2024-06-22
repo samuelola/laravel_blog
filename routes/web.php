@@ -13,6 +13,7 @@ Route::get('/', function () {
 
 Route::resource('posts',PostsController::class);
 Route::post('/addcomment/{post}',[PostCommentController::class,'store'])->name('addcomment');
+Route::get('/commentpost/{post}',[PostCommentController::class,'index'])->name('commentpost');
 Route::resource('users',UserController::class);
 Route::get('register',[RegisterController::class,'register'])->name('signup');
 Route::get('/',[LoginController::class,'signin'])->name('signin');

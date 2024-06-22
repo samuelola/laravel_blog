@@ -9,7 +9,8 @@ use App\Models\BlogPost;
 use App\Observers\BlogPostObserver;
 use App\Services\Counter;
 use Illuminate\Support\Facades\Event;
-
+use App\Http\Resources\Comment as CommentResource;
+use Illuminate\Http\Resources\Json\JsonResource;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -47,6 +48,8 @@ class AppServiceProvider extends ServiceProvider
             Counter::class
         );
 
-
+        // for single resources
+        //CommentResource::withoutWrapping();
+        JsonResource::withoutWrapping();
     }
 }
