@@ -10,15 +10,21 @@ use App\Mail\OrderComment;
 use App\Jobs\NotifyUsersPostWasCommented;
 use App\Jobs\ThrottledMail;
 use App\Events\CommentPosted;
+use App\Traits\LoggingTrait;
 
 class PostCommentController extends Controller
+
 {
+    use LoggingTrait;
     public function store (BlogPost $post, StoreComment $request){
 
          $comment = $post->comments()->create([
              'content' => $request->input('content'),
              'user_id' => $request->user()->id
           ]);
+
+          $message = $comment->commentable->user->name.' commented on a post at '. $comment->created_at;
+          $this->report($message);
 
          //First method also add implement queue ShouldQueue
         //   Mail::to($post->user)->send(

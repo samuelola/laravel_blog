@@ -24,7 +24,7 @@
                 <input id="password" type="password" class="form-control {{ $errors->has('password') ? ' is-invalid' : '' }}" name="password" value="{{ old('password') }}" required>
             </div>
             <div class="form-group">
-            <input type="submit" value="Submit" name="submit"/>
+            <input type="submit" value="Login" name="submit"/>
             </div>
             </form>
            
