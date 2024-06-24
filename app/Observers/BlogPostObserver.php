@@ -10,7 +10,7 @@ class BlogPostObserver
      //this is how to remove cache
     public function updating(BlogPost $blogPost): void
     {
-       Cache::forget("blog-post-{$blogpost->id}");
+       Cache::forget("blog-post-{$blogPost->id}");
     }
 
     //this delete the comments of the post

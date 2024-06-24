@@ -7,33 +7,24 @@ use Illuminate\Support\Facades\Auth;
 use Session;
 use App\User;
 use App\Http\Requests\LoginRequest;
+use App\Services\AuthService;
 
 class LoginController extends Controller
 {
     
-    // public function __construct()
-    // {
-    //     $this->middleware('guest')->except('logout');
-    // }
-
-
     public function signin(){
 
     	return view('auth.login');
     }
 
 
-
-    public function loginn(LoginRequest $request){
+    public function loginn(LoginRequest $request, AuthService $authService){
 
       $validate = $request->validated();  
       $remember_me  = ( !empty( $request->remember_me ) )? TRUE : FALSE;
-      $credentials['email'] = $validate['email'];
-      $credentials['password'] = $validate['password'];
-
+      $credentials = $authService->loginUserCredentials($validate,$request);
       if (Auth::attempt($credentials,$remember_me)) {
             $request->session()->regenerate();
-
             return redirect()->route('posts.index');
 
         }

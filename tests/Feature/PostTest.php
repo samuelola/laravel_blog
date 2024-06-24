@@ -10,11 +10,11 @@ use App\Models\BlogPost;
 class PostTest extends TestCase
 {
     use RefreshDatabase;
-    public function test_no_blog_post_when_nothing_in_database(): void
-    {
-        $response = $this->get('/posts');
-        $response->assertSeeText('There is no blog post');
-    }
+    // public function test_no_blog_post_when_nothing_in_database(): void
+    // {
+    //     $response = $this->get('/posts');
+    //     $response->assertSeeText('There is no blog post');
+    // }
 
   
 

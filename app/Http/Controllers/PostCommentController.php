@@ -5,19 +5,19 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\BlogPost;
 use App\Http\Requests\StoreComment;
-use Illuminate\Support\Facades\Mail;
-use App\Mail\OrderComment;
-use App\Jobs\NotifyUsersPostWasCommented;
-use App\Jobs\ThrottledMail;
-use App\Events\CommentPosted;
-use App\Traits\LoggingTrait;
+// use Illuminate\Support\Facades\Mail;
+// use App\Mail\OrderComment;
+// use App\Jobs\NotifyUsersPostWasCommented;
+// use App\Jobs\ThrottledMail;
+// use App\Traits\LoggingTrait;
 use App\Http\Resources\Comment as CommentResource;
+use Illuminate\Support\Facades\Gate;
+use App\Services\PostCommentService;
 
 class PostCommentController extends Controller
 
 {
-    use LoggingTrait;
-    
+
     public function index(BlogPost $post){
         
       // dump(is_array($post->comments));
@@ -29,15 +29,10 @@ class PostCommentController extends Controller
         //return $post->comments()->with('user')->get();
     }
 
-    public function store (BlogPost $post, StoreComment $request){
-
-         $comment = $post->comments()->create([
-             'content' => $request->input('content'),
-             'user_id' => $request->user()->id
-          ]);
-
-          $message = $comment->commentable->user->name.' commented on a post at '. $comment->created_at;
-          $this->report($message);
+    public function store (BlogPost $post, StoreComment $request, PostCommentService $postCommentService){
+        
+        $postCommentService->postComment($request,$post);
+          
 
          //First method also add implement queue ShouldQueue
         //   Mail::to($post->user)->send(
@@ -49,7 +44,7 @@ class PostCommentController extends Controller
           //     new OrderComment($comment)
           // );
 
-          event(new CommentPosted($comment));
+         
           
           // ThrottledMail::dispatch(new OrderComment($comment), $post->user);
           // NotifyUsersPostWasCommented::dispatch($comment);

@@ -3,15 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-
-use Illuminate\Support\Facades\Hash;
-
-use Illuminate\Support\Facades\Auth;
-
-use App\User;
-
 use App\Http\Requests\RegisterRequest;
-
+use App\Services\AuthService;
 
 class RegisterController extends Controller
 {
@@ -21,16 +14,10 @@ class RegisterController extends Controller
     }
 
 
-    protected function create(RegisterRequest $request)
+    protected function create(RegisterRequest $request, AuthService $authService)
     {
         $data = $request->validated();
-        
-        $user = User::create([
-            'name' => $data['name'],
-            'email' => $data['email'],
-            'password' => Hash::make($data['password'])
-        ]);
-
+        $authService->registerUser($data);
         return redirect()->route('posts.index');
        
     }

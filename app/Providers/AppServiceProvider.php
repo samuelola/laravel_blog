@@ -5,12 +5,21 @@ namespace App\Providers;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Schema;
-use App\Models\BlogPost;
 use App\Observers\BlogPostObserver;
 use App\Services\Counter;
 use Illuminate\Support\Facades\Event;
 use App\Http\Resources\Comment as CommentResource;
 use Illuminate\Http\Resources\Json\JsonResource;
+use App\Models\BlogPost;
+// use App\Models\User;
+// use App\Models\BlogPost;
+// use App\Models\Comment;
+// use App\Policies\UserPolicy;
+// use App\Policies\BlogPostsPolicy;
+// use App\Policies\CommentPolicy;
+
+use Illuminate\Support\Facades\Gate;
+
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -51,5 +60,9 @@ class AppServiceProvider extends ServiceProvider
         // for single resources
         //CommentResource::withoutWrapping();
         JsonResource::withoutWrapping();
+
+        // Gate::policy(User::class, UserPolicy::class);
+        // Gate::policy(BlogPost::class, BlogPostPolicy::class);
+        // Gate::policy(Comment::class, CommentPolicy::class);
     }
 }

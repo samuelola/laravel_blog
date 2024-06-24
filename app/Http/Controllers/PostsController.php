@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Storage;
 use App\Services\Counter;
 use App\Facades\CounterFacade;
 use App\Events\BlogPostPosted;
+use App\Services\PostService;
 
 class PostsController extends Controller implements HasMiddleware
 {
@@ -78,21 +79,13 @@ class PostsController extends Controller implements HasMiddleware
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StorePost $request)
+    public function store(StorePost $request, PostService $postService)
     { 
         $validatedData = $request->validated();
         $validatedData['user_id'] = $request->user()->id;
-        $blogPost= BlogPost::create($validatedData);
-        if($request->hasFile('thumbnail')){
-            $path = $request->file('thumbnail')->store('thumbnails'); //this allows you to save in a folder
-            $blogPost->image()->save(
-                // to associate the image with the blog post
-                Image::make(['path'=>$path])
-            );
-        }
-
+        $blogPost = $postService->createPost($validatedData);
+        $postService->uploadImage($request,$blogPost);
         event(new BlogPostPosted($blogPost));
-       
         $request->session()->flash('status', 'The Blog Post was created!');
         return redirect()->route('posts.index');
     }
@@ -138,32 +131,14 @@ class PostsController extends Controller implements HasMiddleware
     /**
      * Update the specified resource in storage.
      */
-    public function update(StorePost $request, string $id)
+    public function update(StorePost $request, string $id, PostService $postService)
     {
         $post = BlogPost::findOrFail($id);
         // if(Gate::denies('posts.update',$post)){
         //    abort(403,"You can not edit this Blog Post!");
         // }
         Gate::authorize('update',$post);
-        $post->update($request->validated());
-
-        if($request->hasFile('thumbnail')){
-            $path = $request->file('thumbnail')->store('thumbnails');
-            if($post->image){
-                //get and delete the old file
-                Storage::delete($post->image->path);
-               //if the file has an image , modify to the new one
-               $post->image->path = $path;
-               $post->image->save();
-            }else{
-                //store a new image
-                $post->image()->save(
-                    // to associate the image with the blog post
-                    Image::make(['path'=>$path])
-                );
-            }
-            
-        }
+        $postService->updatePost($request, $post);
         $request->session()->flash('status', 'Blog Post Updated!');
         //return redirect()->route('posts.show',['post'=>$post]);
         return view('posts.show',['post'=>$post]);

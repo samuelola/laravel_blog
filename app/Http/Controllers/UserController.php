@@ -9,6 +9,7 @@ use App\Http\Requests\UpdateUser;
 use App\Models\Image;
 use Illuminate\Support\Facades\Storage;
 use App\Facades\CounterFacade;
+use App\Services\UserService;
 
 class UserController extends Controller
 {
@@ -69,27 +70,10 @@ class UserController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateUser $request, User $user)
+    public function update(UpdateUser $request, User $user, UserService $userService)
     {
-        if($request->hasFile('avatar')){
-            $path = $request->file('avatar')->store('avatars');
-            if($user->image){
-                //get and delete the old file
-                Storage::delete($user->image->path);
-             //if the file has an image , modify to the new one
-               $user->image->path = $path;
-               $user->image->save();
-            }else{
-                //store a new image
-                $user->image()->save(
-                    // to associate the image with the blog post
-                    Image::make(['path'=>$path])
-                );
-            }
-        }
-
+        $userService->updateUserImage($request,$user);
         return redirect()->back()->withStatus('User Profile Image Updated!');
-       
     }
 
     /**
