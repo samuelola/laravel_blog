@@ -45,7 +45,7 @@ class BlogPostsPolicy
      */
     public function delete(User $user, BlogPost $blogPost): bool
     {
-        return $user->id == $blogPost->user_id;
+        return false;
     }
 
     /**

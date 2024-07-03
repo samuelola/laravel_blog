@@ -23,8 +23,12 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('images', function (Blueprint $table) {
-            $table->unsignedInteger('blog_post_id')->nullable();
-            $table->dropMorphs('imageable');  
+            if(env('DB_CONNECTION') !== 'sqlite_testing'){
+
+               $table->unsignedInteger('blog_post_id')->nullable();
+               $table->dropMorphs('imageable'); 
+            }
+             
         });
     }
 };

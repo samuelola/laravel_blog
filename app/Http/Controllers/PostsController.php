@@ -155,7 +155,7 @@ class PostsController extends Controller implements HasMiddleware
         //     abort(403,"You can not delete this Blog Post!");
         //  }
 
-        Gate::authorize('delete',$post); 
+        //Gate::authorize('delete',$post); 
         $post->delete();
         Session()->flash('status','Blog Post has been deleted!');
         return redirect()->route('posts.index');

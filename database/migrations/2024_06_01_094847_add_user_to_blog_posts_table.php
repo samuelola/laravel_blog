@@ -22,9 +22,12 @@ return new class extends Migration
      */
     public function down(): void
     {
-        // Schema::table('blog_posts', function (Blueprint $table) {
-        //     $table->dropForeign(['user_id']);
-        //     $table->dropColumn('user_id');
-        // });
+        Schema::table('blog_posts', function (Blueprint $table) {
+             if(env('DB_CONNECTION') !== 'sqlite_testing'){
+                $table->dropForeign(['user_id']);
+                $table->dropColumn('user_id');
+            }
+            
+        });
     }
 };

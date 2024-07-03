@@ -12,8 +12,12 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('comments', function (Blueprint $table) {
-            $table->dropForeign(['blog_post_id']);
-            $table->dropColumn('blog_post_id');
+
+            if(env('DB_CONNECTION') !== 'sqlite_testing'){
+                $table->dropForeign(['blog_post_id']);
+                $table->dropColumn('blog_post_id');
+            }
+
             $table->morphs('commentable');
         });
     }
@@ -24,8 +28,14 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('comments', function (Blueprint $table) {
-            $table->unsignedBigInteger('blog_post_id')->index();
+            if(env('DB_CONNECTION') !== 'sqlite_testing'){
+
+                  $table->unsignedBigInteger('blog_post_id')->index();
             $table->dropMorphs('commentable');
+            }
+
+            
+            
         });
     }
 };
